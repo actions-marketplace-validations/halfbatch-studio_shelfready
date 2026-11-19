@@ -19,6 +19,7 @@ jobs:
           npm run typecheck
           npm test
           npm run build
+          npm run pack:check
       - name: Site
         working-directory: site
         run: |

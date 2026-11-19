@@ -31,7 +31,7 @@ jobs:
 
       - name: Test and build
         working-directory: cli
-        run: npm ci && npm run typecheck && npm test && npm run build
+        run: npm ci && npm run typecheck && npm test && npm run build && npm run pack:check
 
       - name: Publish to npm
         working-directory: cli
