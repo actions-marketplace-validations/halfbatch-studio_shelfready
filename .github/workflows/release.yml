@@ -57,10 +57,14 @@ jobs:
       - name: Update the Homebrew tap
         if: env.TAP_TOKEN != ''
         run: |
+          set -euo pipefail
           v="${GITHUB_REF_NAME#v}"
           url="https://registry.npmjs.org/shelfready/-/shelfready-$v.tgz"
-          for i in $(seq 1 30); do curl -fsSL "$url" -o /tmp/pkg.tgz && break; sleep 10; done
+          # npm can take several minutes to serve a new tarball ("Your package is being processed").
+          for i in $(seq 1 60); do curl -fsSL "$url" -o /tmp/pkg.tgz 2>/dev/null && break; rm -f /tmp/pkg.tgz; sleep 20; done
+          if [ ! -s /tmp/pkg.tgz ]; then echo "::error::$url still not served after 20 minutes; re-run this job later."; exit 1; fi
           sha=$(sha256sum /tmp/pkg.tgz | cut -d' ' -f1)
+          [[ "$sha" =~ ^[0-9a-f]{64}$ ]] || { echo "::error::bad sha256: '$sha'"; exit 1; }
           git clone -q "https://x-access-token:${TAP_TOKEN}@github.com/halfbatch-studio/homebrew-tap.git" /tmp/tap
           mkdir -p /tmp/tap/Formula
           sed -e "s/{{VERSION}}/$v/g" -e "s/{{SHA256}}/$sha/g" packaging/homebrew/shelfready.rb.tmpl > /tmp/tap/Formula/shelfready.rb
