@@ -27,7 +27,7 @@
     "kb:import": "tsx scripts/kb-import.ts",
     "prepack": "npm run build && cp ../README.md ../LICENSE ../NOTICE .",
     "postpack": "rm -f README.md LICENSE NOTICE",
-    "pack:check": "npm pack --dry-run --json | node -e \"const f=JSON.parse(require('fs').readFileSync(0,'utf8'))[0].files.map(x=>x.path);for(const need of ['dist/cli.js','dist/index.js','knowledge/sdks/sentry-cocoa.yaml','README.md','LICENSE']){if(!f.includes(need)){console.error('npm package is missing '+need);process.exit(1)}}console.log('npm package contents ok ('+f.length+' files)')\""
+    "pack:check": "node scripts/pack-check.mjs"
   },
   "license": "Apache-2.0",
   "dependencies": {
