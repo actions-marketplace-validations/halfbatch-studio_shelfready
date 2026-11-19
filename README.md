@@ -8,11 +8,8 @@ Website and the full checklist: **[shelfready.dev](https://shelfready.dev)**
 
 ## Quick start
 
-Requires Node 20 or later.
-
 ```sh
-git clone https://github.com/halfbatch-studio/shelfready
-cd shelfready/cli && npm install && npm run build && npm link   # installs the `shelf` command
+brew install halfbatch-studio/tap/shelfready   # or: npm install -g shelfready   (Node 20+)
 
 cd ~/path/to/your-app
 shelf init --country DE --email support@example.com --brand "Your Studio" --voice I --base-url https://example.com/app/

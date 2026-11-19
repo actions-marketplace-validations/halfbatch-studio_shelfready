@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 import { appendFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { createRequire } from "node:module";
 import { Command, Option } from "commander";
 import { appPrivacy, check, checklist, checklistMarkdown, checkOnline, CURRENT_VERSION, setTicks, factsFromScan, factsToYAML, legalView, migrateFile, needsImpressum, readFacts, renderPages, scan } from "./index.js";
 
 const program = new Command()
   .name("shelf")
   .description("Get an iOS app ready for the App Store shelf: legal pages, privacy truth, preflight.")
-  .version("0.1.0");
+  .version((createRequire(import.meta.url)("../package.json") as { version: string }).version);
 
 const list = (items: string[]) => (items.length ? items.join(", ") : "—");
 const factsPath = (repo: string) => join(resolve(repo), "shelfready.yaml");
