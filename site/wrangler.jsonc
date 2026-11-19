@@ -1,0 +1,14 @@
+// shelfready.dev: a static-assets-only Worker (no server code).
+// Deployed by Cloudflare Workers Builds with `npx wrangler deploy` from this folder after the build.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  // Must match the Worker's name in the Cloudflare dashboard.
+  "name": "shelfready",
+  "compatibility_date": "2026-06-01",
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  },
+  "routes": [{ "pattern": "shelfready.dev", "custom_domain": true }]
+}

@@ -1,0 +1,131 @@
+# Where each SDK's privacy manifest comes from. `npm run kb:import` reads these repos and
+# regenerates knowledge/sdks/*.yaml. `include` selects manifest paths (regex); `aliases` are
+# CocoaPods/Carthage names that should match the same entry.
+- identity: firebase-ios-sdk
+  name: Firebase
+  vendor: Google
+  repo: firebase/firebase-ios-sdk
+  include: ^(Crashlytics|FirebaseAuth|FirebaseCore|FirebaseInstallations|FirebaseMessaging|FirebaseRemoteConfig|Firestore)/
+  aliases: [firebase, firebasecore, firebasecrashlytics, firebaseauth, firebasemessaging, firebaseremoteconfig, firebasefirestore, firebaseinstallations]
+  notes: Google Analytics for Firebase (GoogleAppMeasurement) ships as a binary without a manifest in its repo and isn't covered; check Google's own data disclosure if you use it.
+- identity: purchases-ios
+  name: RevenueCat
+  vendor: RevenueCat, Inc.
+  repo: RevenueCat/purchases-ios
+  include: ^Sources/PrivacyInfo
+  aliases: [purchases-ios-spm, revenuecat, purchases]
+- identity: sentry-cocoa
+  name: Sentry
+  vendor: Functional Software, Inc. (Sentry)
+  repo: getsentry/sentry-cocoa
+  include: ^Sources/
+  aliases: [sentry]
+- identity: mixpanel-swift
+  name: Mixpanel
+  vendor: Mixpanel, Inc.
+  repo: mixpanel/mixpanel-swift
+  include: PrivacyInfo
+  aliases: [mixpanel]
+  notes: "Mixpanel's manifest declares no collected data because what is sent depends on the events and properties your code tracks. Declare what your events contain."
+- identity: amplitude-swift
+  name: Amplitude
+  vendor: Amplitude, Inc.
+  repo: amplitude/Amplitude-Swift
+  include: ^Sources/
+  aliases: [amplitudeswift]
+- identity: posthog-ios
+  name: PostHog
+  vendor: PostHog Inc.
+  repo: PostHog/posthog-ios
+  include: ^(PostHog|vendor)/
+  aliases: [posthog]
+- identity: facebook-ios-sdk
+  name: Facebook SDK
+  vendor: Meta Platforms, Inc.
+  repo: facebook/facebook-ios-sdk
+  include: ^Sources/Facebook
+  aliases: [fbsdkcorekit, fbsdkloginkit, fbsdksharekit, fbaemkit, fbsdkcorekit_basics, facebookcore]
+- identity: onesignal-ios-sdk
+  name: OneSignal
+  vendor: OneSignal, Inc.
+  repo: OneSignal/OneSignal-iOS-SDK
+  include: ^iOS_SDK/OneSignalSDK/OneSignal[A-Za-z]+/PrivacyInfo
+  aliases: [onesignal-xcframework-spm, onesignalxcframework, onesignal]
+- identity: bugsnag-cocoa
+  name: Bugsnag
+  vendor: SmartBear Software (Bugsnag)
+  repo: bugsnag/bugsnag-cocoa
+  include: ^Bugsnag/
+  aliases: [bugsnag]
+- identity: dd-sdk-ios
+  name: Datadog
+  vendor: Datadog, Inc.
+  repo: DataDog/dd-sdk-ios
+  include: ^Datadog[A-Za-z]+/Resources/
+  aliases: [datadogcore, datadogrum, datadogcrashreporting, datadoglogs, datadogtrace]
+- identity: analytics-swift
+  name: Segment
+  vendor: Twilio Inc. (Segment)
+  repo: segmentio/analytics-swift
+  include: PrivacyInfo
+  aliases: [segment]
+  notes: "Segment's manifest lists some types that aren't Apple's standard names (e.g. \"App Name\", \"App Version\"); ShelfReady reports them for you to answer by hand. What Segment sends also depends on the events your code tracks."
+- identity: swiftsdk
+  name: TelemetryDeck
+  vendor: TelemetryDeck GmbH
+  repo: TelemetryDeck/SwiftSDK
+  include: ^Sources/TelemetryDeck/
+  aliases: [telemetrydeck, telemetryclient]
+  notes: "TelemetryDeck sends anonymised signals; what they contain depends on the signals your code sends."
+- identity: adaptysdk-ios
+  name: Adapty
+  vendor: Adapty Tech Inc.
+  repo: adaptyteam/AdaptySDK-iOS
+  include: ^Sources(\.AdaptyUI)?/PrivacyInfo
+  aliases: [adapty, adaptyui]
+- identity: superwall-ios
+  name: Superwall
+  vendor: Superwall, Inc.
+  repo: superwall/Superwall-iOS
+  include: PrivacyInfo
+  aliases: [superwallkit]
+- identity: googlesignin-ios
+  name: Google Sign-In
+  vendor: Google
+  repo: google/GoogleSignIn-iOS
+  include: PrivacyInfo
+  aliases: [googlesignin]
+- identity: supabase-swift
+  name: Supabase
+  vendor: Supabase, Inc.
+  repo: supabase/supabase-swift
+  include: PrivacyInfo
+  aliases: [supabase]
+  notes: "Supabase's manifest declares no collected data. Anything your app stores in Supabase (accounts, user content) is collected by your app: declare it yourself."
+- identity: alamofire
+  name: Alamofire
+  vendor: Alamofire Software Foundation
+  repo: Alamofire/Alamofire
+  include: ^Source/
+- identity: kingfisher
+  name: Kingfisher
+  vendor: Wei Wang (open source)
+  repo: onevcat/Kingfisher
+  include: PrivacyInfo
+- identity: sdwebimage
+  name: SDWebImage
+  vendor: SDWebImage (open source)
+  repo: SDWebImage/SDWebImage
+  include: ^WebImage/PrivacyInfo  # SDWebImage/Resources/PrivacyInfo.xcprivacy is a symlink to this file
+- identity: lottie-ios
+  name: Lottie
+  vendor: Airbnb (open source)
+  repo: airbnb/lottie-ios
+  include: ^Sources/
+  aliases: [lottie-spm, lottie]
+- identity: realm-swift
+  name: Realm
+  vendor: MongoDB, Inc.
+  repo: realm/realm-swift
+  include: PrivacyInfo
+  aliases: [realm, realmswift]

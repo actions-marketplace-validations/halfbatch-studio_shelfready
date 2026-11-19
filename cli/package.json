@@ -1,0 +1,61 @@
+{
+  "name": "shelfready",
+  "version": "0.1.0",
+  "description": "Get an iOS app ready for the App Store shelf: legal pages, privacy truth, preflight.",
+  "type": "module",
+  "bin": {
+    "shelf": "dist/cli.js",
+    "shelfready": "dist/cli.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "knowledge/sdks",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "dev": "tsx src/cli.ts",
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc -p . --noEmit",
+    "kb:import": "tsx scripts/kb-import.ts",
+    "prepack": "cp ../README.md ../LICENSE ../NOTICE .",
+    "postpack": "rm -f README.md LICENSE NOTICE"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "commander": "^15.1.0",
+    "plist": "^5.1.1",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
+  },
+  "author": "Half Batch <hello@shelfready.dev>",
+  "homepage": "https://shelfready.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/halfbatch-studio/shelfready.git",
+    "directory": "cli"
+  },
+  "bugs": "https://github.com/halfbatch-studio/shelfready/issues",
+  "keywords": [
+    "ios",
+    "app-store",
+    "privacy-policy",
+    "privacy-manifest",
+    "impressum",
+    "gdpr",
+    "app-privacy",
+    "cli",
+    "fastlane"
+  ]
+}

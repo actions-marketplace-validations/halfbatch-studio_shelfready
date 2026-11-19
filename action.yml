@@ -1,0 +1,41 @@
+name: ShelfReady check
+description: Fail the build when an iOS app's privacy policy, App Privacy answers or Impressum drift from its code and SDKs.
+author: Half Batch
+branding:
+  icon: check-square
+  color: green
+
+inputs:
+  path:
+    description: Folder of the app repository that holds shelfready.yaml.
+    default: "."
+  online:
+    description: Also check that the published pages are live and current ("true" or "false").
+    default: "false"
+  fail-on-error:
+    description: Fail the job when ShelfReady finds errors ("true" or "false").
+    default: "true"
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+
+    - name: Build ShelfReady
+      shell: bash
+      working-directory: ${{ github.action_path }}/cli
+      run: npm ci --no-audit --no-fund --silent && npm run build --silent
+
+    - name: shelf check
+      shell: bash
+      env:
+        SHELF_PATH: ${{ inputs.path }}
+        SHELF_ONLINE: ${{ inputs.online }}
+        SHELF_FAIL: ${{ inputs.fail-on-error }}
+      run: |
+        args=(check "$SHELF_PATH" --format github)
+        [ "$SHELF_ONLINE" = "true" ] && args+=(--online)
+        [ "$SHELF_FAIL" = "true" ] && args+=(--ci)
+        node "${{ github.action_path }}/cli/dist/cli.js" "${args[@]}"
