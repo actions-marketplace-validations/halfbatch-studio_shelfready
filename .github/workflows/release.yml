@@ -71,5 +71,7 @@ jobs:
           mkdir -p /tmp/tap/Formula
           sed -e "s/{{VERSION}}/$v/g" -e "s/{{SHA256}}/$sha/g" packaging/homebrew/shelfready.rb.tmpl > /tmp/tap/Formula/shelfready.rb
           cd /tmp/tap
-          git -c user.name="Half Batch" -c user.email="hello@shelfready.dev" commit -qam "shelfready $v" || { git add Formula/shelfready.rb && git -c user.name="Half Batch" -c user.email="hello@shelfready.dev" commit -qm "shelfready $v"; }
+          git add Formula/shelfready.rb
+          if git diff --cached --quiet; then echo "Formula already at $v"; exit 0; fi
+          git -c user.name="Half Batch" -c user.email="hello@shelfready.dev" commit -qm "shelfready $v"
           git push -q origin HEAD
