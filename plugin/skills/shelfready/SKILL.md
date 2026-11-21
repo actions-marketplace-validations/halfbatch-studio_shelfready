@@ -38,7 +38,7 @@ Without them, use the CLI, which does the same: `npx -y shelfready <command>` (o
 4. **Check** and fix findings in the code or the YAML (table below). Re-run until there are no errors.
 5. **Pages**: generate, then help publish them wherever their site is (GitHub Pages, their own site). Edit the YAML, never the generated Markdown; it is overwritten. For DE/AT traders also generate `LegalView.swift` and add it to Settings.
 6. **App Privacy**: produce the answers. Anything listed as unmapped must be answered by hand in App Store Connect; say so, don't guess.
-7. **Checklist**: show what's left. Tick manual items (`trademark`, `trader-status`, `paid-agreements`, `asc-app-info`, `asc-urls`, `asc-app-privacy`, `asc-age-rating`, `asc-screenshots`, `testflight`, `submitted`) only after the developer says they did them.
+7. **Checklist**: show what's left. Items marked `?` (not checked) are live-page checks that only run with `online: true`; run that rather than calling them open. Tick manual items (`trademark`, `trader-status`, `paid-agreements`, `asc-app-info`, `asc-urls`, `asc-app-privacy`, `asc-age-rating`, `asc-screenshots`, `testflight`, `submitted`) only after the developer says they did them.
 8. Once pages are live, `check` with `online: true` to confirm they show the YAML's date, email and FAQ. Offer the GitHub Action so drift fails pull requests:
    ```yaml
    - uses: halfbatch-studio/shelfready@v0

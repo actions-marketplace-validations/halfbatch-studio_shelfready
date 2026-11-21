@@ -30,6 +30,8 @@ jobs:
           if [ "$tag" != "$pkg" ]; then echo "::error::Tag $GITHUB_REF_NAME doesn't match cli/package.json version $pkg"; exit 1; fi
           plugin=$(node -p "require('../plugin/.claude-plugin/plugin.json').version"); pin=$(node -p "require('../plugin/.mcp.json').mcpServers.shelfready.args.find(a => a.startsWith('shelfready@')).split('@')[1]")
           if [ "$plugin" != "$pkg" ] || [ "$pin" != "$pkg" ]; then echo "::error::plugin.json ($plugin) and plugin/.mcp.json (shelfready@$pin) must match cli/package.json ($pkg)"; exit 1; fi
+          server=$(node -p "require('../server.json').version")
+          if [ "$server" != "$pkg" ]; then echo "::error::server.json version ($server) must match cli/package.json ($pkg)"; exit 1; fi
 
       - name: Test and build
         working-directory: cli
@@ -75,3 +77,30 @@ jobs:
           if git diff --cached --quiet; then echo "Formula already at $v"; exit 0; fi
           git -c user.name="Half Batch" -c user.email="hello@shelfready.dev" commit -qm "shelfready $v"
           git push -q origin HEAD
+
+      - name: Install cosign (verifies mcp-publisher)
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+        continue-on-error: true
+
+      - name: Publish to the MCP Registry
+        # Lists the server at registry.modelcontextprotocol.io, which MCP clients and directories read.
+        # GitHub OIDC proves we own io.github.halfbatch-studio/*; no secret needed.
+        # The registry is in preview, so a failure here doesn't fail the release.
+        continue-on-error: true
+        env:
+          MCP_PUBLISHER_VERSION: v1.8.1
+        run: |
+          set -euo pipefail
+          v="${GITHUB_REF_NAME#v}"
+          for i in $(seq 1 60); do [ "$(npm view "shelfready@$v" mcpName 2>/dev/null)" = "io.github.halfbatch-studio/shelfready" ] && break; sleep 20; done
+          archive="mcp-publisher_linux_amd64.tar.gz"
+          base="https://github.com/modelcontextprotocol/registry/releases/download/${MCP_PUBLISHER_VERSION}"
+          curl -fsSL -o "$archive" "$base/$archive"
+          curl -fsSL -o "$archive.sigstore.json" "$base/$archive.sigstore.json"
+          cosign verify-blob --bundle "$archive.sigstore.json" \
+            --certificate-identity "https://github.com/modelcontextprotocol/registry/.github/workflows/release.yml@refs/tags/${MCP_PUBLISHER_VERSION}" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" "$archive"
+          tar xzf "$archive" mcp-publisher
+          rm -f "$archive" "$archive.sigstore.json"
+          ./mcp-publisher login github-oidc
+          ./mcp-publisher publish

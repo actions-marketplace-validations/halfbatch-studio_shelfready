@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1 (2026-11-21)
+
+- `shelf checklist`: live-page items show as "not checked" (`?`) instead of open when you run without `--online`, and the summary says how many weren't checked.
+- Listed in the official MCP Registry as `io.github.halfbatch-studio/shelfready`; the release workflow publishes each version there.
+- README: setup for Claude Code (from the terminal, so it also works in VS Code), Codex CLI and other MCP clients.
+
 ## 0.2.0 (2026-11-20)
 
 - `shelf mcp`: an MCP server on stdio with the CLI's commands as tools (`scan`, `init`, `check`, `checklist`, `tick`, `pages`, `app_privacy`, `sdk_info`, `migrate`). No new dependencies; tested against the official MCP SDK client. Tools only write inside the app repo.

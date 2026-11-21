@@ -3,7 +3,7 @@ import { appendFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { createRequire } from "node:module";
 import { Command, Option } from "commander";
-import { appPrivacy, check, checklist, checklistMarkdown, checkOnline, CURRENT_VERSION, setTicks, factsToYAML, initFacts, legalView, migrateFile, pageFiles, readFacts, scan } from "./index.js";
+import { appPrivacy, check, checklist, checklistMarkdown, checklistSummary, checkOnline, CURRENT_VERSION, setTicks, factsToYAML, initFacts, legalView, migrateFile, pageFiles, readFacts, scan } from "./index.js";
 
 const program = new Command()
   .name("shelf")
@@ -188,7 +188,7 @@ program
       } else console.log(md);
       return;
     }
-    const icon = { done: "✓", todo: "○", fail: "✗" } as const;
+    const icon = { done: "✓", todo: "○", fail: "✗", unchecked: "?" } as const;
     for (const group of [...new Set(rows.map((r) => r.group))]) {
       console.log(`\n${group}`);
       for (const r of rows.filter((x) => x.group === group)) {
@@ -197,8 +197,7 @@ program
         if (r.how) console.log(`      ${r.how}`);
       }
     }
-    const done = rows.filter((r) => r.status === "done").length;
-    console.log(`\n${done} of ${rows.length} done.${rows.some((r) => !r.automatic && r.status !== "done") ? " Tick manual items with: shelf checklist --done <id>" : ""}`);
+    console.log(`\n${checklistSummary(rows)}${rows.some((r) => !r.automatic && r.status !== "done") ? " Tick manual items with: shelf checklist --done <id>" : ""}`);
   });
 
 program

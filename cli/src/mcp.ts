@@ -6,7 +6,7 @@ import { createRequire } from "node:module";
 import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { createInterface } from "node:readline";
 import {
-  appPrivacy, check, checklist, checkOnline, CURRENT_VERSION, factsToYAML, initFacts, knowledgeBase, legalView,
+  appPrivacy, check, checklist, checklistSummary, checkOnline, CURRENT_VERSION, factsToYAML, initFacts, knowledgeBase, legalView,
   lookup, migrateFile, pageFiles, readFacts, scan, sdkCollects, sdkTracks, setTicks, type Finding,
 } from "./index.js";
 
@@ -155,10 +155,11 @@ export const TOOLS: Tool[] = [
     run: async (a) => {
       const r = await findingsFor(repo(a), a.online === true);
       const rows = checklist({ facts: r.facts, scan: r.scan, findings: check(r.facts, r.scan, { fileVersion: r.fileVersion }), ...(r.onlineFindings ? { online: r.onlineFindings } : {}) });
-      const mark = { done: "✓", todo: "○", fail: "✗" } as const;
+      const mark = { done: "✓", todo: "○", fail: "✗", unchecked: "?" } as const;
       const lines = rows.map((x) => `${mark[x.status]} ${x.title}${x.detail ? ` (${x.detail})` : ""}${x.automatic ? "" : ` [${x.id}]`}${x.status !== "done" && x.how ? `\n    ${x.how}` : ""}`);
       const done = rows.filter((x) => x.status === "done").length;
-      return { text: `${lines.join("\n")}\n\n${done} of ${rows.length} done.`, data: { done, total: rows.length, items: rows } };
+      const unchecked = rows.filter((x) => x.status === "unchecked").length;
+      return { text: `${lines.join("\n")}\n\n${checklistSummary(rows).replace("--online", "online: true")}`, data: { done, unchecked, total: rows.length, items: rows } };
     },
   },
   {

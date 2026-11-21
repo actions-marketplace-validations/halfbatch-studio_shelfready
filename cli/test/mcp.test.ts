@@ -128,4 +128,9 @@ test("plugin: version and MCP pin match the npm package", () => {
   const args: string[] = JSON.parse(readFileSync(join(cliDir, "../plugin/.mcp.json"), "utf8")).mcpServers.shelfready.args;
   assert.equal(plugin, pkg, "plugin/.claude-plugin/plugin.json version");
   assert.ok(args.includes(`shelfready@${pkg}`), `plugin/.mcp.json should run shelfready@${pkg}, has ${args.join(" ")}`);
+  const server = JSON.parse(readFileSync(join(cliDir, "../server.json"), "utf8"));
+  assert.equal(server.version, pkg, "server.json version");
+  assert.equal(server.packages[0].version, pkg, "server.json package version");
+  assert.equal(server.name, JSON.parse(readFileSync(join(cliDir, "package.json"), "utf8")).mcpName, "server.json name = package.json mcpName");
+  assert.ok(server.description.length <= 100, "MCP registry descriptions are limited to 100 characters");
 });

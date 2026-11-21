@@ -1,7 +1,7 @@
 {
   "name": "shelfready",
-  "version": "0.2.0",
-  "description": "Get an iOS app ready for the App Store shelf: legal pages, privacy truth, preflight.",
+  "version": "0.2.1",
+  "description": "Get an iOS app ready for the App Store: legal pages, App Privacy answers, privacy manifests and a go-live checklist. CLI and MCP server for coding agents.",
   "type": "module",
   "bin": {
     "shelf": "dist/cli.js",
@@ -58,6 +58,18 @@
     "gdpr",
     "app-privacy",
     "cli",
-    "fastlane"
-  ]
+    "fastlane",
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "claude",
+    "claude-code",
+    "codex",
+    "cursor",
+    "ai-agents",
+    "swift",
+    "xcode",
+    "app-store-connect"
+  ],
+  "mcpName": "io.github.halfbatch-studio/shelfready"
 }

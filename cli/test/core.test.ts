@@ -337,7 +337,7 @@ test("checklist: automatic items, manual ticks stored in the YAML, markdown", as
     const status = (id: string) => rows().find((r) => r.id === id)?.status;
     assert.equal(status("export-compliance"), "done");
     assert.equal(status("privacy-manifest"), "done");
-    assert.equal(status("privacy-page"), "todo", "needs --online");
+    assert.equal(status("privacy-page"), "unchecked", "needs --online");
     assert.equal(status("trademark"), "todo");
     assert.equal(rows().find((r) => r.id === "impressum-page"), undefined, "US: no Impressum items");
 
