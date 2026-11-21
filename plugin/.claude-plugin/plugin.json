@@ -1,0 +1,11 @@
+{
+  "name": "shelfready",
+  "displayName": "ShelfReady",
+  "version": "0.2.0",
+  "description": "Get an iOS app ready for the App Store: privacy policy, support page, Impressum, App Privacy answers and a go-live checklist, generated from the app's own code.",
+  "author": { "name": "Half Batch", "email": "hello@shelfready.dev", "url": "https://shelfready.dev" },
+  "homepage": "https://shelfready.dev",
+  "repository": "https://github.com/halfbatch-studio/shelfready",
+  "license": "Apache-2.0",
+  "keywords": ["ios", "app-store", "privacy-policy", "privacy-manifest", "impressum", "gdpr", "mcp"]
+}

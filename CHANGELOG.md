@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.0 (2026-11-20)
+
+- `shelf mcp`: an MCP server on stdio with the CLI's commands as tools (`scan`, `init`, `check`, `checklist`, `tick`, `pages`, `app_privacy`, `sdk_info`, `migrate`). No new dependencies; tested against the official MCP SDK client. Tools only write inside the app repo.
+- Claude Code plugin in `plugin/`: a ShelfReady skill plus the MCP server. Install with `/plugin install shelfready --marketplace halfbatch-studio/shelfready`.
+
 ## 0.1.1 (2026-11-19)
 
 - Fix: the npm package now includes the built CLI (`dist/`). 0.1.0 on npm was missing it, so `shelf` didn't run.

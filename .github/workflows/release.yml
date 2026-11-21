@@ -28,6 +28,8 @@ jobs:
         run: |
           tag="${GITHUB_REF_NAME#v}"; pkg=$(node -p "require('./package.json').version")
           if [ "$tag" != "$pkg" ]; then echo "::error::Tag $GITHUB_REF_NAME doesn't match cli/package.json version $pkg"; exit 1; fi
+          plugin=$(node -p "require('../plugin/.claude-plugin/plugin.json').version"); pin=$(node -p "require('../plugin/.mcp.json').mcpServers.shelfready.args.find(a => a.startsWith('shelfready@')).split('@')[1]")
+          if [ "$plugin" != "$pkg" ] || [ "$pin" != "$pkg" ]; then echo "::error::plugin.json ($plugin) and plugin/.mcp.json (shelfready@$pin) must match cli/package.json ($pkg)"; exit 1; fi
 
       - name: Test and build
         working-directory: cli

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "shelfready": {
+      "command": "npx",
+      "args": ["-y", "shelfready@0.2.0", "mcp"]
+    }
+  }
+}

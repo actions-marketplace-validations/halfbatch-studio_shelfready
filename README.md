@@ -31,6 +31,29 @@ shelf checklist --online                      # what's left before you submit
 | `shelf check` | Drift between `shelfready.yaml` and the repo, missing manifests, placeholder permission texts, unknown SDKs, trader details, in-app Impressum. `--ci` exits 1 on errors, `--online` checks the published pages, `--format github` annotates pull requests |
 | `shelf checklist` | The go-live checklist: automatic items from `check`, manual ones you tick with `--done <id>`; `--markdown` writes it as a file |
 | `shelf migrate` | Updates `shelfready.yaml` to the current schema, keeping your comments and style |
+| `shelf mcp` | Runs the MCP server on stdio, so Claude and other agents can use all of the above |
+
+## Use with Claude
+
+**Claude Code:** install the plugin. It adds a ShelfReady skill (the go-live workflow, what to ask you, how to fix each finding) and starts the MCP server for you.
+
+```
+/plugin install shelfready --marketplace halfbatch-studio/shelfready
+```
+
+(Claude Code before 2.1.275: `/plugin marketplace add halfbatch-studio/shelfready`, then `/plugin install shelfready@shelfready`.) Then ask something like "get this app ready for the App Store".
+
+**Other MCP clients** (Claude Desktop, Cursor, …): add the server to the client's MCP config.
+
+```json
+{
+  "mcpServers": {
+    "shelfready": { "command": "npx", "args": ["-y", "shelfready", "mcp"] }
+  }
+}
+```
+
+Tools: `scan`, `init`, `check`, `checklist`, `tick`, `pages`, `app_privacy`, `sdk_info`, `migrate`. Each takes `path`, the app repo, and only ever writes inside it. The skill alone is in [`plugin/skills/shelfready`](plugin/skills/shelfready/SKILL.md) if you'd rather upload it to claude.ai.
 
 ## GitHub Action
 
@@ -60,7 +83,7 @@ One file in your app repo holds the facts behind your pages: app, publisher (`vo
 
 ## Status and limits
 
-- Version 0.1. Used to ship [kipple](https://halfbatch.studio/kipple/); expect rough edges.
+- Version 0.2. Used to ship [kipple](https://halfbatch.studio/kipple/); expect rough edges.
 - **Not legal advice.** Page templates are drafts based on § 5 DDG, the GDPR and Apple's rules, not yet reviewed by a lawyer. You're responsible for what your pages say.
 - iOS only for now.
 
@@ -71,6 +94,7 @@ cli/        the `shelf` CLI and its core library (TypeScript), tests, SDK knowle
 site/       shelfready.dev, generated from the same checklist items as the CLI
 examples/   real configs and output
 action.yml  the GitHub Action
+plugin/     the Claude Code plugin: skill and MCP server config
 ```
 
 ## License
