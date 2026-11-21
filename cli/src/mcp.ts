@@ -6,7 +6,7 @@ import { createRequire } from "node:module";
 import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { createInterface } from "node:readline";
 import {
-  appPrivacy, check, checklist, checklistSummary, checkOnline, CURRENT_VERSION, factsToYAML, initFacts, knowledgeBase, legalView,
+  addAgentsNote, type AgentsNoteResult, appPrivacy, check, checklist, checklistSummary, checkOnline, CURRENT_VERSION, factsToYAML, initFacts, knowledgeBase, legalView,
   lookup, migrateFile, pageFiles, readFacts, scan, sdkCollects, sdkTracks, setTicks, type Finding,
 } from "./index.js";
 
@@ -115,6 +115,7 @@ export const TOOLS: Tool[] = [
         voice: { type: "string", enum: ["I", "we"], description: "How pages speak: I (solo developer) or we (team)." },
         baseUrl: str("Where the pages will live, e.g. https://example.com/myapp/"),
         force: bool("Overwrite an existing shelfready.yaml."),
+        agentsNote: bool("Also add a short ShelfReady note to AGENTS.md (or CLAUDE.md, if the repo uses that) so coding agents run the checks before a release. Ask the developer first."),
       },
       required: ["country", "email"],
     },
@@ -131,7 +132,13 @@ export const TOOLS: Tool[] = [
       }
       const yaml = factsToYAML(result.facts);
       writeFileSync(out, yaml);
-      return { text: [`Wrote ${out}`, ...result.notes].join("\n"), data: { file: out, notes: result.notes, yaml } };
+      const lines = [`Wrote ${out}`, ...result.notes];
+      let agents: AgentsNoteResult | undefined;
+      if (a.agentsNote === true) {
+        agents = addAgentsNote(root);
+        lines.push(agents.action === "present" ? `${relative(root, agents.file)} already has the ShelfReady note.` : `${agents.action === "created" ? "Created" : "Added the ShelfReady note to"} ${relative(root, agents.file)}.`);
+      }
+      return { text: lines.join("\n"), data: { file: out, notes: result.notes, yaml, ...(agents ? { agentsNote: agents } : {}) } };
     },
   },
   {

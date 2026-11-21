@@ -1,9 +1,10 @@
 #!/usr/bin/env node
-import { appendFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join, relative, resolve } from "node:path";
+import { createInterface } from "node:readline/promises";
 import { createRequire } from "node:module";
 import { Command, Option } from "commander";
-import { appPrivacy, check, checklist, checklistMarkdown, checklistSummary, checkOnline, CURRENT_VERSION, setTicks, factsToYAML, initFacts, legalView, migrateFile, pageFiles, readFacts, scan } from "./index.js";
+import { addAgentsNote, agentsNoteFile, type AgentsNoteResult, appPrivacy, check, checklist, checklistMarkdown, checklistSummary, checkOnline, CURRENT_VERSION, setTicks, factsToYAML, initFacts, legalView, migrateFile, pageFiles, readFacts, scan } from "./index.js";
 
 const program = new Command()
   .name("shelf")
@@ -67,7 +68,9 @@ program
   .addOption(new Option("--voice <voice>", "how pages speak: I (solo) or we (team)").choices(["I", "we"]).default("we"))
   .option("--base-url <url>", "where the pages will live, e.g. https://example.com/myapp/")
   .option("--force", "overwrite an existing shelfready.yaml")
-  .action((path: string, o: { country: string; email: string; brand?: string; publisher?: string; trader?: boolean; phone?: string; voice: "I" | "we"; baseUrl?: string; force?: boolean }) => {
+  .option("--agents-note", "add a ShelfReady note to AGENTS.md (or CLAUDE.md) without asking")
+  .option("--no-agents-note", "don't add the note and don't ask")
+  .action(async (path: string, o: { country: string; email: string; brand?: string; publisher?: string; trader?: boolean; phone?: string; voice: "I" | "we"; baseUrl?: string; force?: boolean; agentsNote?: boolean }) => {
     const out = factsPath(path);
     if (existsSync(out) && !o.force) {
       console.error(`${out} exists. Use --force to overwrite.`);
@@ -83,7 +86,43 @@ program
     writeFileSync(out, factsToYAML(result.facts));
     console.log(`Wrote ${out}`);
     for (const n of result.notes) console.log(n.replace("generate the pages", "run `shelf pages`"));
+    await offerAgentsNote(path, o.agentsNote);
   });
+
+program
+  .command("agents")
+  .description("Add a short ShelfReady note to AGENTS.md (or CLAUDE.md), so coding agents in this repo run the checks before a release.")
+  .argument("[path]", "app repository", ".")
+  .action((path: string) => reportAgentsNote(addAgentsNote(path)));
+
+/** A path to show: relative to where you are, unless that climbs out of it. */
+const shown = (file: string) => {
+  const rel = relative(process.cwd(), file);
+  return rel && !rel.startsWith("..") ? rel : file;
+};
+
+function reportAgentsNote(r: AgentsNoteResult) {
+  const name = shown(r.file);
+  console.log(r.action === "present" ? `${name} already has the ShelfReady note.` : `${r.action === "created" ? "Created" : "Added the ShelfReady note to"} ${name}.`);
+}
+
+async function offerAgentsNote(path: string, choice: boolean | undefined) {
+  if (choice === false) return;
+  const target = agentsNoteFile(path);
+  if (existsSync(target) && readFileSync(target, "utf8").includes("<!-- shelfready -->")) return;
+  const file = shown(target);
+  if (choice === undefined) {
+    if (!process.stdin.isTTY || !process.stdout.isTTY) {
+      console.log(`Tip: \`shelf agents\` adds a note to ${file} so coding agents in this repo run \`shelf check\` before a release.`);
+      return;
+    }
+    const rl = createInterface({ input: process.stdin, output: process.stdout });
+    const answer = await rl.question(`Add a ShelfReady note to ${file}, so coding agents (Claude Code, Codex, Cursor, Xcode) run the checks before a release? [Y/n] `);
+    rl.close();
+    if (/^n/i.test(answer.trim())) return;
+  }
+  reportAgentsNote(addAgentsNote(path));
+}
 
 program
   .command("pages")

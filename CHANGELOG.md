@@ -5,6 +5,8 @@
 - `shelf checklist`: live-page items show as "not checked" (`?`) instead of open when you run without `--online`, and the summary says how many weren't checked.
 - Listed in the official MCP Registry as `io.github.halfbatch-studio/shelfready`; the release workflow publishes each version there.
 - README: setup for Claude Code (from the terminal, so it also works in VS Code), Codex CLI and other MCP clients.
+- `shelf agents`, and an offer in `shelf init` (`--agents-note`, `--no-agents-note`; `agentsNote` in the MCP tool): adds a short ShelfReady note to `AGENTS.md`, or `CLAUDE.md` if the repo uses that, so every coding agent in the repo runs the checks before a release.
+- shelfready.dev: a page per SDK (what it collects and what to declare in App Privacy), a section for coding agents, `llms.txt`, `sitemap.xml`.
 
 ## 0.2.0 (2026-11-20)
 

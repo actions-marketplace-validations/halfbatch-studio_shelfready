@@ -4,7 +4,13 @@ Get an iOS app ready for the App Store shelf. ShelfReady reads your repo and kee
 
 It does not upload builds or fill in App Store Connect; use [`asc`](https://github.com/rudrankriyam/App-Store-Connect-CLI) or fastlane for that. ShelfReady covers the legal, privacy and web layer around them, with the EU steps most tools skip.
 
-Website and the full checklist: **[shelfready.dev](https://shelfready.dev)**
+Try it in your app's repo, nothing to install:
+
+```sh
+npx -y shelfready check
+```
+
+Website, the full checklist and what common SDKs collect: **[shelfready.dev](https://shelfready.dev)**
 
 ## Quick start
 
@@ -31,6 +37,7 @@ shelf checklist --online                      # what's left before you submit
 | `shelf check` | Drift between `shelfready.yaml` and the repo, missing manifests, placeholder permission texts, unknown SDKs, trader details, in-app Impressum. `--ci` exits 1 on errors, `--online` checks the published pages, `--format github` annotates pull requests |
 | `shelf checklist` | The go-live checklist: automatic items from `check`, manual ones you tick with `--done <id>`; `--markdown` writes it as a file |
 | `shelf migrate` | Updates `shelfready.yaml` to the current schema, keeping your comments and style |
+| `shelf agents` | Adds a short note to `AGENTS.md` (or `CLAUDE.md`) so coding agents in the repo run the checks before a release; `shelf init` offers it |
 | `shelf mcp` | Runs the MCP server on stdio, so Claude and other agents can use all of the above |
 
 ## Use with your coding agent

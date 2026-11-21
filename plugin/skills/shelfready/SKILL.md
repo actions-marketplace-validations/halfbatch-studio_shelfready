@@ -33,6 +33,7 @@ Without them, use the CLI, which does the same: `npx -y shelfready <command>` (o
    - brand or studio name, and whether pages say "I" or "we",
    - whether they charge for the app or in-app purchases (EU trader),
    - where the pages will live (base URL), if they know.
+   - whether to add a short ShelfReady note to `AGENTS.md` (or `CLAUDE.md`), so any coding agent in the repo runs the checks before a release (`agentsNote: true` on `init`, or `shelf agents`).
    Traders also need a legal name, a business address (never a home address) and, in DE/AT, a phone or contact form plus VAT ID and register details for companies. Ask; never fill these in from guesses, the git log or the Apple developer account.
 3. **Fill in what only the developer knows** by editing `shelfready.yaml` with them: `app.tagline`, `privacyNotes` (where data lives, e.g. "everything stays on the device and in your iCloud"), `support.faq`, `support.replyTime`. Draft from the code and ask them to confirm.
 4. **Check** and fix findings in the code or the YAML (table below). Re-run until there are no errors.

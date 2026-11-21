@@ -67,7 +67,8 @@ test("mcp: the go-live flow from scan to checklist", async () => {
   assert.equal(noFile.isError, true);
   assert.match(noFile.content[0]!.text, /init/);
 
-  const init = await call("init", { country: "DE", email: "hi@example.com", brand: "Example", voice: "I", baseUrl: "https://example.com/notes/" });
+  const init = await call("init", { country: "DE", email: "hi@example.com", brand: "Example", voice: "I", baseUrl: "https://example.com/notes/", agentsNote: true });
+  assert.match(readFileSync(join(root, "AGENTS.md"), "utf8"), /shelfready check/);
   assert.equal(init.isError, undefined, init.content[0]?.text);
   assert.ok(existsSync(join(root, "shelfready.yaml")));
   assert.equal((await call("init", { country: "DE", email: "x@example.com" })).isError, true, "refuses to overwrite");
