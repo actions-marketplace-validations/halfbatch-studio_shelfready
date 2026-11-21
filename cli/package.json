@@ -1,6 +1,6 @@
 {
   "name": "shelfready",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Get an iOS app ready for the App Store shelf: legal pages, privacy truth, preflight.",
   "type": "module",
   "bin": {
@@ -36,6 +36,7 @@
     "yaml": "^2.9.1"
   },
   "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
     "@types/node": "^22.20.5",
     "tsx": "^4.23.15",
     "typescript": "^5.9.3"

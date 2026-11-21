@@ -1,12 +1,12 @@
 # Releasing
 
 ## Every release
-1. Bump `version` in `cli/package.json` and add a `## X.Y.Z (date)` section to `CHANGELOG.md`.
+1. Bump the version in `cli/package.json`, `plugin/.claude-plugin/plugin.json` and the `shelfready@X.Y.Z` pin in `plugin/.mcp.json` (CI fails if they differ), and add a `## X.Y.Z (date)` section to `CHANGELOG.md`.
 2. Commit, then tag and push:
    ```sh
    git tag -a vX.Y.Z -m "ShelfReady X.Y.Z" && git push origin main vX.Y.Z
    ```
-3. The **Release** workflow tests and builds, publishes `shelfready` to npm, creates the GitHub release from the changelog, moves the `v0` tag (so `halfbatch-studio/shelfready@v0` gets the new version) and updates the Homebrew formula.
+3. The **Release** workflow tests and builds, publishes `shelfready` to npm, creates the GitHub release from the changelog, moves the `v0` tag (so `halfbatch-studio/shelfready@v0` gets the new version) and updates the Homebrew formula. The Claude Code plugin is served straight from this repo's `main`, so it updates when the version bump is merged; its MCP server starts the pinned npm version, which is why the npm publish has to succeed before people update the plugin.
 
 Use the Half Batch identity in your clone so tags don't expose your email:
 `git config user.name "Half Batch" && git config user.email "hello@shelfready.dev"`.

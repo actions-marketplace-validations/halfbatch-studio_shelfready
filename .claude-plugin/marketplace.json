@@ -1,0 +1,12 @@
+{
+  "name": "shelfready",
+  "owner": { "name": "Half Batch", "email": "hello@shelfready.dev", "url": "https://shelfready.dev" },
+  "description": "ShelfReady for Claude Code: get an iOS app ready for the App Store.",
+  "plugins": [
+    {
+      "name": "shelfready",
+      "source": "./plugin",
+      "description": "Legal pages, App Privacy answers and a go-live checklist for iOS apps, from the app's own code. Skill plus MCP server."
+    }
+  ]
+}
