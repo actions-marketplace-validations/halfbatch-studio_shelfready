@@ -9,3 +9,4 @@ export * from "./core/migrate.js";
 export * from "./core/online.js";
 export * from "./core/checklist.js";
 export * from "./core/knowledge.js";
+export * from "./core/agents.js";

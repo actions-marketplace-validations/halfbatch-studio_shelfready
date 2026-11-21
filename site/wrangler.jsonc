@@ -10,5 +10,7 @@
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page"
   },
-  "routes": [{ "pattern": "shelfready.dev", "custom_domain": true }]
+  "routes": [{ "pattern": "shelfready.dev", "custom_domain": true }],
+  // Pull requests get a preview URL (npx wrangler preview); production stays on shelfready.dev.
+  "previews": {}
 }

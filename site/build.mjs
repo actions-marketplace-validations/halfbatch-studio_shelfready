@@ -4,6 +4,9 @@ import { copyFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { ITEMS, knowledgeBase } from "../cli/dist/index.js";
+import { writeSdkPages } from "./sdk-pages.mjs";
+
+const SITE = "https://shelfready.dev";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const dist = join(here, "dist");
@@ -61,7 +64,8 @@ const checklistHTML = groups
   .join("\n");
 
 const autoCount = ITEMS.filter((i) => i.auto).length;
-const sdkNames = knowledgeBase().map((e) => e.name).sort((a, b) => a.localeCompare(b));
+const kb = knowledgeBase().slice().sort((a, b) => a.name.localeCompare(b.name));
+const sdkNames = kb.map((e) => e.name);
 
 const html = `<!doctype html>
 <html lang="en">
@@ -72,9 +76,9 @@ const html = `<!doctype html>
 <meta name="description" content="Everything between “code done” and “live on the App Store”: privacy manifests, App Privacy answers, privacy policy, Impressum, EU trader status. ${autoCount} of ${ITEMS.length} steps checked automatically by the shelf CLI.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='6' width='26' height='20' rx='2' fill='%23C8A574'/%3E%3Cpath d='M9 16l5 5 9-10' stroke='%231C2740' stroke-width='3.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <style>
-@font-face { font-family: "Archivo"; src: url(fonts/archivo.woff2) format("woff2"); font-weight: 100 900; font-stretch: 62% 125%; font-display: swap; }
-@font-face { font-family: "Source Serif"; src: url(fonts/source-serif-4.woff2) format("woff2"); font-weight: 200 900; font-display: swap; }
-@font-face { font-family: "Source Serif"; src: url(fonts/source-serif-4-italic.woff2) format("woff2"); font-weight: 200 900; font-style: italic; font-display: swap; }
+@font-face { font-family: "Archivo"; src: url(/fonts/archivo.woff2) format("woff2"); font-weight: 100 900; font-stretch: 62% 125%; font-display: swap; }
+@font-face { font-family: "Source Serif"; src: url(/fonts/source-serif-4.woff2) format("woff2"); font-weight: 200 900; font-display: swap; }
+@font-face { font-family: "Source Serif"; src: url(/fonts/source-serif-4-italic.woff2) format("woff2"); font-weight: 200 900; font-style: italic; font-display: swap; }
 :root {
   --paper: #F3F5F7; --kraft: #C8A574; --kraft-deep: #A9844F; --ink: #1C2740; --stamp: #2E7D5B; --muted: #5E6A82; --slip: #FFFFFF; --rule: #D9DEE6;
   --sans: "Archivo", system-ui, sans-serif; --serif: "Source Serif", Georgia, serif;
@@ -91,10 +95,11 @@ a:hover { text-decoration-thickness: 2px; }
 code { font: 500 0.88em/1 ui-monospace, "SF Mono", Menlo, monospace; background: color-mix(in srgb, var(--kraft) 18%, transparent); padding: 0.12em 0.35em; border-radius: 4px; }
 .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
 
-header.top { display: flex; justify-content: space-between; align-items: center; padding: 22px 0; font: 600 0.95rem var(--sans); }
+header.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px 24px; padding: 22px 0; font: 600 0.95rem var(--sans); }
 .mark { display: inline-flex; gap: 10px; align-items: center; text-decoration: none; font-stretch: 112%; letter-spacing: 0.01em; }
 .mark svg { width: 26px; height: 26px; }
-nav a { margin-left: 22px; text-decoration: none; color: var(--muted); }
+nav { display: flex; flex-wrap: wrap; gap: 6px 20px; }
+nav a { text-decoration: none; color: var(--muted); white-space: nowrap; }
 nav a:hover { color: var(--ink); }
 
 .hero { display: grid; grid-template-columns: 1fr; gap: 40px; padding: 40px 0 64px; align-items: start; }
@@ -150,6 +155,44 @@ h2 { font: 800 clamp(1.8rem, 3.6vw, 2.5rem)/1.08 var(--sans); font-stretch: 118%
 .steps h3 { font: 700 1.15rem var(--sans); margin: 0 0 6px; }
 .steps p { margin: 0 0 10px; color: var(--muted); }
 .sdks { margin-top: 36px; max-width: 46em; color: var(--muted); }
+.get { margin: 32px 0 0; font: 500 0.95rem/1.5 var(--sans); color: var(--muted); }
+.get code { font-size: 0.95em; color: var(--ink); }
+
+.agents { display: grid; gap: 32px; align-items: start; }
+@media (min-width: 900px) { .agents { grid-template-columns: 1fr 1.1fr; gap: 64px; } }
+.agents .intro { margin-bottom: 20px; }
+.ask { font: 750 clamp(1.3rem, 2.4vw, 1.6rem)/1.25 var(--sans); font-stretch: 110%; margin: 0 0 20px; max-width: 22em; }
+.ask::before { content: "“"; color: var(--kraft-deep); }
+.ask::after { content: "”"; color: var(--kraft-deep); }
+.agents ul.does { margin: 0; padding-left: 1.1em; color: var(--muted); }
+.agents ul.does li { margin: 0 0 6px; }
+.cmds { background: var(--slip); border-radius: 6px; box-shadow: 0 1px 0 var(--rule), 0 18px 40px -24px rgba(28, 39, 64, 0.45); overflow: hidden; min-width: 0; }
+.cmds::before { content: ""; display: block; height: 14px; background: repeating-linear-gradient(90deg, var(--kraft) 0 18px, var(--kraft-deep) 18px 20px); }
+.cmds dl { margin: 0; padding: 6px 22px 10px; }
+.cmds dt { font: 650 0.95rem var(--sans); padding-top: 16px; }
+.cmds dd { margin: 6px 0 0; padding-bottom: 16px; border-bottom: 1px solid var(--rule); }
+.cmds dd:last-of-type { border-bottom: 0; }
+.cmds dd > code { display: block; background: none; padding: 0; font-size: 0.86rem; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.cmds dd p { margin: 6px 0 0; font: 500 0.88rem/1.45 var(--sans); color: var(--muted); }
+.sdk { padding: 32px 0 24px; }
+.crumb { font: 600 0.9rem var(--sans); margin: 0 0 12px; }
+.crumb a { color: var(--muted); }
+.sdk-title { font: 850 clamp(2.2rem, 5vw, 3.6rem)/1 var(--sans); font-stretch: 125%; letter-spacing: -0.02em; margin: 0 0 20px; }
+.basis { font: 500 0.95rem/1.5 var(--sans); color: var(--muted); max-width: 46em; }
+.kb { width: 100%; border-collapse: collapse; font: 500 0.98rem/1.4 var(--sans); margin: 0 0 24px; }
+.kb th, .kb td { text-align: left; padding: 12px 12px 12px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.kb thead th { font-weight: 650; color: var(--muted); font-size: 0.88rem; }
+.kb tbody th { font-weight: 650; }
+@media (max-width: 640px) { .kb thead { display: none; } .kb tr { display: grid; grid-template-columns: 1fr 1fr; padding: 10px 0; border-bottom: 1px solid var(--rule); } .kb th, .kb td { border: 0; padding: 2px 8px 2px 0; } .kb tbody th { grid-column: 1 / -1; } .kb td:nth-of-type(2)::before { content: "Linked: "; color: var(--muted); } .kb td:nth-of-type(3)::before { content: "Tracking: "; color: var(--muted); } .kb td:first-of-type { grid-column: 1 / -1; color: var(--muted); } }
+.kb-none, .note { max-width: 42em; }
+.note { color: var(--muted); border-left: 3px solid var(--kraft); padding-left: 14px; }
+.mods { padding-left: 1.1em; max-width: 46em; }
+.mods li { margin: 0 0 8px; }
+.sdk-list { list-style: none; padding: 0; margin: 24px 0; display: grid; gap: 0 48px; }
+@media (min-width: 760px) { .sdk-list { grid-template-columns: 1fr 1fr; } }
+.sdk-list li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; padding: 14px 0; border-bottom: 1px solid var(--rule); font: 600 1.02rem var(--sans); }
+.sdk-list span { font-weight: 500; font-size: 0.9rem; color: var(--muted); }
+.cmds dd p code { font-size: 0.92em; overflow-wrap: anywhere; }
 
 footer { padding: 40px 0 56px; border-top: 1px solid var(--rule); font: 500 0.92rem/1.6 var(--sans); color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px 28px; justify-content: space-between; }
 footer a { color: var(--ink); }
@@ -163,7 +206,7 @@ footer a { color: var(--ink); }
 <div class="wrap">
   <header class="top">
     <a class="mark" href="/" aria-label="ShelfReady home"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="6" width="26" height="20" rx="2" fill="#C8A574"/><path d="M9 16l5 5 9-10" stroke="currentColor" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>ShelfReady</a>
-    <nav><a href="#checklist">Checklist</a><a href="#cli">The CLI</a></nav>
+    <nav><a href="/#checklist">Checklist</a><a href="/#cli">The CLI</a><a href="/#agents">Agents</a><a href="/sdks/">SDKs</a></nav>
   </header>
 
   <main>
@@ -171,7 +214,8 @@ footer a { color: var(--ink); }
       <div>
         <h1>Is your app shelf&#8209;ready?</h1>
         <p class="lede">Between <em>code done</em> and <em>live on the App Store</em> sit ${ITEMS.length} steps that have nothing to do with code: privacy manifests, App Privacy answers, a privacy policy, an Impressum, EU trader status. Here they all are, in order. ${autoCount} of them the <code>shelf</code> CLI checks for you.</p>
-        <p class="install">Open-source CLI on <a href="https://github.com/halfbatch-studio/shelfready">GitHub</a>. It already shipped an app: <a href="https://halfbatch.studio/kipple/">kipple</a>.</p>
+        <p class="install"><code>brew install halfbatch-studio/tap/shelfready</code></p>
+        <p class="install">Open-source CLI and MCP server on <a href="https://github.com/halfbatch-studio/shelfready">GitHub</a>, so your coding agent can do it for you. It already shipped an app: <a href="https://halfbatch.studio/kipple/">kipple</a>.</p>
       </div>
       <div class="slip" aria-label="Example: shelf checklist for kipple">
         <div class="slip-head"><span>shelf checklist · kipple</span><span class="count">13 of 18</span></div>
@@ -204,7 +248,34 @@ ${checklistHTML}
         <li><h3>Generate the pages</h3><p><code>shelf pages</code> writes the privacy policy, support page and Impressum, plus a SwiftUI view for the Impressum in your app. <code>shelf store</code> writes your App Privacy answers.</p></li>
         <li><h3>Stop drift in CI</h3><p><code>shelf check --ci</code> fails the build when a new SDK or data type isn't in your policy. <code>--online</code> checks that the live pages are current.</p></li>
       </ol>
-      <p class="sdks">It knows what ${sdkNames.length} common SDKs collect, read from their own privacy manifests: ${sdkNames.map(esc).join(", ")}.</p>
+      <p class="sdks">It knows what ${kb.length} common SDKs collect, read from their own privacy manifests: ${kb.map((e) => `<a href="/sdks/${e.identity}/">${esc(e.name)}</a>`).join(", ")}.</p>
+      <p class="get">Install with <code>brew install halfbatch-studio/tap/shelfready</code> or <code>npm install -g shelfready</code> (Node 20 or later). In CI, use the GitHub Action <code>halfbatch-studio/shelfready@v0</code>.</p>
+    </section>
+
+    <section class="block" id="agents">
+      <div class="agents">
+        <div>
+          <h2>Or hand it to your coding agent</h2>
+          <p class="intro">Building with Claude Code, Codex or Cursor? ShelfReady comes with an MCP server and a skill, so the agent that wrote your app can get it on the shelf.</p>
+          <p class="ask">Get this app ready for the App Store.</p>
+          <ul class="does">
+            <li>It scans your repo and tells you what it found.</li>
+            <li>It asks for the details only you know: your legal name, address, trader status.</li>
+            <li>It writes the pages and App Privacy answers, fixes what <code>check</code> finds, and works through the checklist with you.</li>
+          </ul>
+        </div>
+        <div class="cmds" aria-label="Setup for coding agents">
+          <dl>
+            <dt>Claude Code</dt>
+            <dd><code>claude plugin marketplace add halfbatch-studio/shelfready
+claude plugin install shelfready@shelfready</code><p>Adds the skill and the server. Works in the terminal, VS Code and the desktop app.</p></dd>
+            <dt>Codex CLI</dt>
+            <dd><code>codex mcp add shelfready -- npx -y shelfready mcp</code></dd>
+            <dt>Cursor and other MCP clients</dt>
+            <dd><code>{ "mcpServers": { "shelfready": { "command": "npx", "args": ["-y", "shelfready", "mcp"] } } }</code><p>For Cursor, in <code>.cursor/mcp.json</code>. Listed in the MCP Registry as <code>io.github.halfbatch-studio/shelfready</code>.</p></dd>
+          </dl>
+        </div>
+      </div>
     </section>
   </main>
 
@@ -234,6 +305,38 @@ ${checklistHTML}
 </html>
 `;
 writeFileSync(join(dist, "index.html"), html);
+const llmsChecklist = groups
+  .map((g) => `### ${g}\n\n` + ITEMS.filter((i) => i.group === g).map((i) => `- ${i.title}${i.auto ? " (checked by shelf)" : ""}: ${i.how(ctx).replace(/\s+/g, " ")}`).join("\n"))
+  .join("\n\n");
+// For agents that read sites: what ShelfReady is and how to use it, as plain Markdown (https://llmstxt.org).
+writeFileSync(
+  join(dist, "llms.txt"),
+  `# ShelfReady
+
+> Open-source CLI and MCP server that gets an iOS app ready for the App Store: privacy policy, support page, Impressum (Germany/Austria), App Privacy answers (fastlane format), privacy manifest checks and a go-live checklist, all generated from the app's own code and one file, shelfready.yaml.
+
+Use it when someone building an iOS app asks what Apple or the EU requires before release, needs a privacy policy or App Privacy ("nutrition label") answers, adds a third-party SDK, or is about to submit for review.
+
+## Install
+
+- CLI: \`brew install halfbatch-studio/tap/shelfready\` or \`npm install -g shelfready\` (commands: \`shelf scan|init|pages|store|check|checklist|migrate\`)
+- MCP server (stdio): \`npx -y shelfready mcp\`; tools: scan, init, check, checklist, tick, pages, app_privacy, sdk_info, migrate. MCP Registry name: io.github.halfbatch-studio/shelfready
+- Claude Code plugin (skill + server): \`claude plugin marketplace add halfbatch-studio/shelfready\` then \`claude plugin install shelfready@shelfready\`
+- GitHub Action: \`uses: halfbatch-studio/shelfready@v0\`
+
+## The go-live checklist
+
+${llmsChecklist}
+
+## Links
+
+- [README and docs](https://github.com/halfbatch-studio/shelfready)
+- [Skill for agents](https://github.com/halfbatch-studio/shelfready/blob/main/plugin/skills/shelfready/SKILL.md)
+- [What iOS SDKs collect](${SITE}/sdks/): ${kb.map((e) => `[${e.name}](${SITE}/sdks/${e.identity}/)`).join(", ")}
+
+Generated pages are drafts, not legal advice.
+`,
+);
 writeFileSync(join(dist, "_headers"), "/fonts/*\n  Cache-Control: public, max-age=31536000, immutable\n");
 writeFileSync(
   join(dist, "404.html"),
@@ -241,4 +344,19 @@ writeFileSync(
 <style>body{margin:0;font:1.1rem/1.6 Georgia,serif;background:#F3F5F7;color:#1C2740;display:grid;place-items:center;min-height:100vh;padding:24px}a{color:inherit}@media(prefers-color-scheme:dark){body{background:#141B2B;color:#E8ECF3}}</style></head>
 <body><p>This page isn't on the shelf. Go to the <a href="/">go-live checklist</a>.</p></body></html>\n`,
 );
-console.log(`Wrote dist/index.html (${ITEMS.length} checklist items, ${sdkNames.length} SDKs)`);
+// SDK pages share the home page's styles, header and footer.
+const css = html.match(/<style>([\s\S]*?)<\/style>/)[1];
+const header = html.match(/<header class="top">[\s\S]*?<\/header>/)[0];
+const footer = html.match(/<footer>[\s\S]*?<\/footer>/)[0];
+const sdkPaths = writeSdkPages({ dist, kb, css, esc, header, footer, siteURL: SITE });
+writeFileSync(
+  join(dist, "favicon.svg"),
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect x="3" y="6" width="26" height="20" rx="2" fill="#C8A574"/><path d="M9 16l5 5 9-10" stroke="#1C2740" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>\n`,
+);
+writeFileSync(
+  join(dist, "sitemap.xml"),
+  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${["/", "/sdks/", ...sdkPaths].map((p) => `  <url><loc>${SITE}${p}</loc></url>`).join("\n")}\n</urlset>\n`,
+);
+writeFileSync(join(dist, "robots.txt"), `User-agent: *\nAllow: /\nSitemap: ${SITE}/sitemap.xml\n`);
+console.log(`Wrote ${sdkPaths.length} SDK pages, sitemap.xml, robots.txt`);
+console.log(`Wrote dist/index.html and llms.txt (${ITEMS.length} checklist items, ${sdkNames.length} SDKs)`);

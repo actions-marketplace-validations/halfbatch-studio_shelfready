@@ -67,7 +67,8 @@ test("mcp: the go-live flow from scan to checklist", async () => {
   assert.equal(noFile.isError, true);
   assert.match(noFile.content[0]!.text, /init/);
 
-  const init = await call("init", { country: "DE", email: "hi@example.com", brand: "Example", voice: "I", baseUrl: "https://example.com/notes/" });
+  const init = await call("init", { country: "DE", email: "hi@example.com", brand: "Example", voice: "I", baseUrl: "https://example.com/notes/", agentsNote: true });
+  assert.match(readFileSync(join(root, "AGENTS.md"), "utf8"), /shelfready check/);
   assert.equal(init.isError, undefined, init.content[0]?.text);
   assert.ok(existsSync(join(root, "shelfready.yaml")));
   assert.equal((await call("init", { country: "DE", email: "x@example.com" })).isError, true, "refuses to overwrite");
@@ -128,4 +129,9 @@ test("plugin: version and MCP pin match the npm package", () => {
   const args: string[] = JSON.parse(readFileSync(join(cliDir, "../plugin/.mcp.json"), "utf8")).mcpServers.shelfready.args;
   assert.equal(plugin, pkg, "plugin/.claude-plugin/plugin.json version");
   assert.ok(args.includes(`shelfready@${pkg}`), `plugin/.mcp.json should run shelfready@${pkg}, has ${args.join(" ")}`);
+  const server = JSON.parse(readFileSync(join(cliDir, "../server.json"), "utf8"));
+  assert.equal(server.version, pkg, "server.json version");
+  assert.equal(server.packages[0].version, pkg, "server.json package version");
+  assert.equal(server.name, JSON.parse(readFileSync(join(cliDir, "package.json"), "utf8")).mcpName, "server.json name = package.json mcpName");
+  assert.ok(server.description.length <= 100, "MCP registry descriptions are limited to 100 characters");
 });

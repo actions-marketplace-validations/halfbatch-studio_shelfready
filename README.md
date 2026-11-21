@@ -4,7 +4,13 @@ Get an iOS app ready for the App Store shelf. ShelfReady reads your repo and kee
 
 It does not upload builds or fill in App Store Connect; use [`asc`](https://github.com/rudrankriyam/App-Store-Connect-CLI) or fastlane for that. ShelfReady covers the legal, privacy and web layer around them, with the EU steps most tools skip.
 
-Website and the full checklist: **[shelfready.dev](https://shelfready.dev)**
+Try it in your app's repo, nothing to install:
+
+```sh
+npx -y shelfready check
+```
+
+Website, the full checklist and what common SDKs collect: **[shelfready.dev](https://shelfready.dev)**
 
 ## Quick start
 
@@ -31,19 +37,29 @@ shelf checklist --online                      # what's left before you submit
 | `shelf check` | Drift between `shelfready.yaml` and the repo, missing manifests, placeholder permission texts, unknown SDKs, trader details, in-app Impressum. `--ci` exits 1 on errors, `--online` checks the published pages, `--format github` annotates pull requests |
 | `shelf checklist` | The go-live checklist: automatic items from `check`, manual ones you tick with `--done <id>`; `--markdown` writes it as a file |
 | `shelf migrate` | Updates `shelfready.yaml` to the current schema, keeping your comments and style |
+| `shelf agents` | Adds a short note to `AGENTS.md` (or `CLAUDE.md`) so coding agents in the repo run the checks before a release; `shelf init` offers it |
 | `shelf mcp` | Runs the MCP server on stdio, so Claude and other agents can use all of the above |
 
-## Use with Claude
+## Use with your coding agent
 
-**Claude Code:** install the plugin. It adds a ShelfReady skill (the go-live workflow, what to ask you, how to fix each finding) and starts the MCP server for you.
+ShelfReady includes an MCP server (`shelf mcp`) and a skill, so the agent you build your app with can run the whole go-live flow: scan the repo, ask you for the publisher details it can't know, write the pages and App Privacy answers, and work through the checklist.
 
+**Claude Code** (terminal, VS Code, JetBrains, desktop): install the plugin, which adds the skill and starts the server.
+
+```sh
+claude plugin marketplace add halfbatch-studio/shelfready
+claude plugin install shelfready@shelfready
 ```
-/plugin install shelfready --marketplace halfbatch-studio/shelfready
+
+Then ask: "get this app ready for the App Store".
+
+**Codex CLI:**
+
+```sh
+codex mcp add shelfready -- npx -y shelfready mcp
 ```
 
-(Claude Code before 2.1.275: `/plugin marketplace add halfbatch-studio/shelfready`, then `/plugin install shelfready@shelfready`.) Then ask something like "get this app ready for the App Store".
-
-**Other MCP clients** (Claude Desktop, Cursor, …): add the server to the client's MCP config.
+**Cursor, Claude Desktop, Windsurf and other MCP clients:** add this to the client's MCP config (for Cursor, `.cursor/mcp.json` in your app repo).
 
 ```json
 {
@@ -53,7 +69,9 @@ shelf checklist --online                      # what's left before you submit
 }
 ```
 
-Tools: `scan`, `init`, `check`, `checklist`, `tick`, `pages`, `app_privacy`, `sdk_info`, `migrate`. Each takes `path`, the app repo, and only ever writes inside it. The skill alone is in [`plugin/skills/shelfready`](plugin/skills/shelfready/SKILL.md) if you'd rather upload it to claude.ai.
+Tools: `scan`, `init`, `check`, `checklist`, `tick`, `pages`, `app_privacy`, `sdk_info`, `migrate`. Each takes `path`, the app repo, and only ever writes inside it. The server is listed in the [MCP Registry](https://registry.modelcontextprotocol.io) as `io.github.halfbatch-studio/shelfready`.
+
+The skill, [`plugin/skills/shelfready/SKILL.md`](plugin/skills/shelfready/SKILL.md), follows the open Agent Skills format: copy the folder into any agent that reads skills, or upload it to claude.ai.
 
 ## GitHub Action
 
